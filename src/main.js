@@ -272,7 +272,7 @@ function loadHistory() {
 
     if (tasks.length === 0) {
         historyList.innerHTML = `
-            <tr class="hover:bg-gray-50 transition-colors">
+            <tr>
                 <td class="px-6 py-4 text-sm text-gray-500 text-center italic" colspan="6">No tasks recorded yet.</td>
             </tr>
         `;
@@ -287,7 +287,8 @@ function loadHistory() {
 
     tasks.forEach((task, index) => {
         const row = document.createElement('tr');
-        row.className = 'hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0';
+        const zebraClass = index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-750';
+        row.className = `${zebraClass} border-b border-gray-100 dark:border-gray-700 last:border-0`;
 
         const dateStr = new Date(task.startTime).toLocaleDateString(undefined, {
             month: 'short', day: 'numeric'
