@@ -22,6 +22,13 @@ const btnCancelModal = document.getElementById('btn-cancel-modal');
 const btnDeleteSelected = document.getElementById('btn-delete-selected');
 const selectAllCheckbox = document.getElementById('select-all-checkbox');
 
+// Delete Modal Elements
+const deleteModal = document.getElementById('delete-modal');
+const deleteModalContent = document.getElementById('delete-modal-content');
+const deleteModalText = document.getElementById('delete-modal-text');
+const btnCancelDelete = document.getElementById('btn-cancel-delete');
+const btnConfirmDelete = document.getElementById('btn-confirm-delete');
+
 // --- State ---
 let currentTask = null; // { description, startTime }
 let timerInterval = null;
@@ -51,8 +58,15 @@ taskForm.addEventListener('submit', (e) => {
 
 btnEndTask.addEventListener('click', endTask);
 
-btnDeleteSelected.addEventListener('click', deleteSelectedTasks);
+btnDeleteSelected.addEventListener('click', showDeleteModal);
 selectAllCheckbox.addEventListener('change', toggleSelectAll);
+
+// Delete Modal Listeners
+btnCancelDelete.addEventListener('click', hideDeleteModal);
+btnConfirmDelete.addEventListener('click', confirmDelete);
+deleteModal.addEventListener('click', (e) => {
+    if (e.target === deleteModal) hideDeleteModal();
+});
 
 // Close modal on outside click
 taskModal.addEventListener('click', (e) => {
@@ -173,6 +187,8 @@ function loadHistory() {
             </tr>
         `;
         selectAllCheckbox.disabled = true;
+        selectAllCheckbox.checked = false;
+        updateDeleteButtonState();
         return;
     }
     selectAllCheckbox.disabled = false;
@@ -226,22 +242,42 @@ function updateDeleteButtonState() {
     btnDeleteSelected.textContent = selectedCount > 0 ? `Delete Selected (${selectedCount})` : 'Delete Selected';
 }
 
-function deleteSelectedTasks() {
+function showDeleteModal() {
     const checkboxes = document.querySelectorAll('.task-checkbox:checked');
     if (checkboxes.length === 0) return;
 
-    if (!confirm(`Are you sure you want to delete ${checkboxes.length} task(s)?`)) return;
+    deleteModalText.textContent = `Are you sure you want to delete ${checkboxes.length} task${checkboxes.length !== 1 ? 's' : ''}? This action cannot be undone.`;
 
-    const indicesToDelete = Array.from(checkboxes).map(cb => parseInt(cb.dataset.index)).sort((a, b) => b - a); // Sort descending to remove safely
+    deleteModal.classList.remove('hidden');
+    setTimeout(() => {
+        deleteModal.classList.remove('opacity-0');
+        deleteModalContent.classList.remove('scale-95');
+        deleteModalContent.classList.add('scale-100');
+    }, 10);
+}
+
+function hideDeleteModal() {
+    deleteModal.classList.add('opacity-0');
+    deleteModalContent.classList.remove('scale-100');
+    deleteModalContent.classList.add('scale-95');
+    setTimeout(() => {
+        deleteModal.classList.add('hidden');
+    }, 300);
+}
+
+function confirmDelete() {
+    const checkboxes = document.querySelectorAll('.task-checkbox:checked');
+    const indicesToDelete = Array.from(checkboxes).map(cb => parseInt(cb.dataset.index)).sort((a, b) => b - a);
 
     let tasks = getTasks();
 
-    // Remove items (must be done from highest index to lowest to avoid shifting issues)
     indicesToDelete.forEach(index => {
         tasks.splice(index, 1);
     });
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+
+    hideDeleteModal();
     loadHistory();
 }
 
