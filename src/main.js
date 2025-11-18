@@ -293,10 +293,10 @@ function loadHistory() {
             month: 'short', day: 'numeric'
         });
         const startTimeStr = new Date(task.startTime).toLocaleTimeString(undefined, {
-            hour: '2-digit', minute: '2-digit'
+            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
         });
         const endTimeStr = new Date(task.endTime).toLocaleTimeString(undefined, {
-            hour: '2-digit', minute: '2-digit'
+            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
         });
 
         row.innerHTML = `
