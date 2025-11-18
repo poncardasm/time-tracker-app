@@ -83,7 +83,13 @@
     <!-- History Section -->
     <section class="w-full max-w-2xl">
         <div class="flex items-center justify-between mb-4 px-2">
-            <h2 class="text-xl font-bold text-gray-800">History</h2>
+            <div class="flex items-center space-x-4">
+                <button id="btn-delete-selected"
+                    class="text-sm text-red-600 hover:text-red-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    disabled>
+                    Delete Selected
+                </button>
+            </div>
             <span id="total-tasks-count" class="text-sm text-gray-500 bg-white px-2 py-1 rounded shadow-sm">0
                 tasks</span>
         </div>
@@ -93,6 +99,10 @@
                 <table class="w-full text-left">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
+                            <th class="px-6 py-3 w-10">
+                                <input type="checkbox" id="select-all-checkbox"
+                                    class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                            </th>
                             <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
                             <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                             <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Start</th>
@@ -104,7 +114,7 @@
                     <tbody id="history-list" class="divide-y divide-gray-200">
                         <!-- History items will be injected here -->
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 text-sm text-gray-500 text-center italic" colspan="5">No tasks recorded
+                            <td class="px-6 py-4 text-sm text-gray-500 text-center italic" colspan="6">No tasks recorded
                                 yet.</td>
                         </tr>
                     </tbody>

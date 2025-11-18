@@ -19,6 +19,8 @@ const totalTasksCount = document.getElementById('total-tasks-count');
 const btnStartTask = document.getElementById('btn-start-task');
 const btnEndTask = document.getElementById('btn-end-task');
 const btnCancelModal = document.getElementById('btn-cancel-modal');
+const btnDeleteSelected = document.getElementById('btn-delete-selected');
+const selectAllCheckbox = document.getElementById('select-all-checkbox');
 
 // --- State ---
 let currentTask = null; // { description, startTime }
@@ -48,6 +50,9 @@ taskForm.addEventListener('submit', (e) => {
 });
 
 btnEndTask.addEventListener('click', endTask);
+
+btnDeleteSelected.addEventListener('click', deleteSelectedTasks);
+selectAllCheckbox.addEventListener('change', toggleSelectAll);
 
 // Close modal on outside click
 taskModal.addEventListener('click', (e) => {
@@ -164,13 +169,15 @@ function loadHistory() {
     if (tasks.length === 0) {
         historyList.innerHTML = `
             <tr class="hover:bg-gray-50 transition-colors">
-                <td class="px-6 py-4 text-sm text-gray-500 text-center italic" colspan="5">No tasks recorded yet.</td>
+                <td class="px-6 py-4 text-sm text-gray-500 text-center italic" colspan="6">No tasks recorded yet.</td>
             </tr>
         `;
+        selectAllCheckbox.disabled = true;
         return;
     }
+    selectAllCheckbox.disabled = false;
 
-    tasks.forEach(task => {
+    tasks.forEach((task, index) => {
         const row = document.createElement('tr');
         row.className = 'hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0';
 
@@ -185,6 +192,9 @@ function loadHistory() {
         });
 
         row.innerHTML = `
+            <td class="px-6 py-4">
+                <input type="checkbox" class="task-checkbox rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" data-index="${index}">
+            </td>
             <td class="px-6 py-4 text-sm text-gray-900 font-medium">${escapeHtml(task.taskName)}</td>
             <td class="px-6 py-4 text-sm text-gray-500">${dateStr}</td>
             <td class="px-6 py-4 text-sm text-gray-500">${startTimeStr}</td>
@@ -193,6 +203,46 @@ function loadHistory() {
         `;
         historyList.appendChild(row);
     });
+
+    // Add listeners to new checkboxes
+    document.querySelectorAll('.task-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateDeleteButtonState);
+    });
+
+    // Reset header checkbox
+    selectAllCheckbox.checked = false;
+    updateDeleteButtonState();
+}
+
+function toggleSelectAll() {
+    const checkboxes = document.querySelectorAll('.task-checkbox');
+    checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+    updateDeleteButtonState();
+}
+
+function updateDeleteButtonState() {
+    const selectedCount = document.querySelectorAll('.task-checkbox:checked').length;
+    btnDeleteSelected.disabled = selectedCount === 0;
+    btnDeleteSelected.textContent = selectedCount > 0 ? `Delete Selected (${selectedCount})` : 'Delete Selected';
+}
+
+function deleteSelectedTasks() {
+    const checkboxes = document.querySelectorAll('.task-checkbox:checked');
+    if (checkboxes.length === 0) return;
+
+    if (!confirm(`Are you sure you want to delete ${checkboxes.length} task(s)?`)) return;
+
+    const indicesToDelete = Array.from(checkboxes).map(cb => parseInt(cb.dataset.index)).sort((a, b) => b - a); // Sort descending to remove safely
+
+    let tasks = getTasks();
+
+    // Remove items (must be done from highest index to lowest to avoid shifting issues)
+    indicesToDelete.forEach(index => {
+        tasks.splice(index, 1);
+    });
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    loadHistory();
 }
 
 function escapeHtml(text) {
