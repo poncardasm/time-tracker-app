@@ -3,6 +3,8 @@
  * Handles timer logic, state management, and Local Storage persistence.
  */
 
+import './main.css';
+
 // --- DOM Elements ---
 const startView = document.getElementById('start-view');
 const activeView = document.getElementById('active-view');
@@ -49,7 +51,7 @@ function init() {
     loadHistory();
     initTheme();
 
-    // Check if there's a task currently running (persisted in session or just memory if we wanted to go that far, 
+    // Check if there's a task currently running (persisted in session or just memory if we wanted to go that far,
     // but for MVP we'll just start fresh or maybe check if we want to support reload persistence later.
     // For now, simple start.)
 }
@@ -304,7 +306,7 @@ function loadHistory() {
             <td class="px-6 py-4 text-sm text-gray-900 font-medium">
                 <div class="flex items-center justify-between group">
                     <span>${escapeHtml(task.taskName)}</span>
-                    <button class="text-gray-400 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity p-1" onclick="showModal('edit', ${index})">
+                    <button class="text-gray-400 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity p-1 edit-task-btn" data-index="${index}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
@@ -322,6 +324,14 @@ function loadHistory() {
     // Add listeners to new checkboxes
     document.querySelectorAll('.task-checkbox').forEach(cb => {
         cb.addEventListener('change', updateDeleteButtonState);
+    });
+
+    // Add listeners to edit buttons
+    document.querySelectorAll('.edit-task-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = parseInt(e.currentTarget.dataset.index);
+            showModal('edit', index);
+        });
     });
 
     // Reset header checkbox
@@ -511,3 +521,46 @@ function updateThemeIcons(isDark) {
 
 // Run Init
 init();
+
+// Register Service Worker for PWA functionality
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker
+            .register("/sw.js")
+            .then((registration) => {
+                console.log(
+                    "Service Worker registered successfully:",
+                    registration.scope
+                );
+
+                // Check for updates every time the page loads
+                registration.update();
+
+                // Listen for updates
+                registration.addEventListener("updatefound", () => {
+                    const newWorker = registration.installing;
+                    console.log("New service worker found, installing...");
+
+                    newWorker.addEventListener("statechange", () => {
+                        if (
+                            newWorker.state === "installed" &&
+                            navigator.serviceWorker.controller
+                        ) {
+                            // New service worker is ready, reload to activate it
+                            console.log("New service worker installed, reloading...");
+                            window.location.reload();
+                        }
+                    });
+                });
+            })
+            .catch((error) => {
+                console.log("Service Worker registration failed:", error);
+            });
+
+        // Also check if there's a waiting service worker
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+            console.log("Service worker controller changed, reloading...");
+            window.location.reload();
+        });
+    });
+}

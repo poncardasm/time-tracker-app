@@ -8,13 +8,7 @@
     <link rel="manifest" href="manifest.json" />
     <link rel="icon" type="image/svg+xml" href="icon-192.svg" />
     <title>Minimalist Time Tracker</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: "class",
-      };
-    </script>
+    <script type="module" src="/src/main.js"></script>
   </head>
 
   <body
@@ -105,20 +99,18 @@
             Start tracking your next task.
           </p>
         </div>
-        <div class="flex space-x-4">
-          <button
-            id="btn-start-task"
-            class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          >
-            Start New Task
-          </button>
-          <button
-            id="btn-manual-entry"
-            class="flex-1 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 text-indigo-600 dark:text-indigo-400 font-bold py-4 px-6 rounded-xl shadow-lg border border-gray-200 dark:border-slate-600 transform transition hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          >
-            Manual Entry
-          </button>
-        </div>
+        <button
+          id="btn-start-task"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        >
+          Start New Task
+        </button>
+        <button
+          id="btn-manual-entry"
+          class="w-full mt-3 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium transition-colors focus:outline-none focus:underline"
+        >
+          Manual Entry
+        </button>
       </div>
 
       <!-- Active Tracking View (Hidden by default) -->
@@ -153,7 +145,7 @@
     </main>
 
     <!-- History Section -->
-    <section class="w-full max-w-2xl">
+    <section class="w-full max-w-4xl">
       <div class="flex items-center justify-between mb-4 px-2">
         <div class="flex items-center space-x-4">
           <button
@@ -367,25 +359,5 @@
         </div>
       </div>
     </div>
-
-    <script src="app.js"></script>
-    <script>
-      // Register Service Worker for PWA functionality
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/sw.js")
-            .then((registration) => {
-              console.log(
-                "Service Worker registered successfully:",
-                registration.scope
-              );
-            })
-            .catch((error) => {
-              console.log("Service Worker registration failed:", error);
-            });
-        });
-      }
-    </script>
   </body>
 </html>
