@@ -10,6 +10,9 @@ export default {
       colors: {
         gray: {
           750: '#2d3748',
+        },
+        slate: {
+          750: '#293548',
         }
       }
     },
