@@ -313,7 +313,7 @@ function loadHistory() {
                     </button>
                 </div>
             </td>
-            <td class="px-6 py-4 text-sm text-gray-500">${dateStr}</td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">${dateStr}</td>
             <td class="px-6 py-4 text-sm text-gray-500">${startTimeStr}</td>
             <td class="px-6 py-4 text-sm text-gray-500">${endTimeStr}</td>
             <td class="px-6 py-4 text-sm text-gray-900 font-mono text-right">${formatTime(task.durationMs)}</td>
