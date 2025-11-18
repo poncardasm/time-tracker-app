@@ -5,7 +5,8 @@ const urlsToCache = [
     '/app.js',
     '/manifest.json',
     '/icon-192.svg',
-    '/icon-512.svg'
+    '/icon-512.svg',
+    'https://cdn.tailwindcss.com'
 ];
 
 // Install event - cache resources

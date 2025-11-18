@@ -14,10 +14,17 @@ const currentTaskNameEl = document.getElementById('current-task-name');
 const timerDisplay = document.getElementById('timer-display');
 const historyList = document.getElementById('history-list');
 const totalTasksCount = document.getElementById('total-tasks-count');
+const manualTimeFields = document.getElementById('manual-time-fields');
+const startTimeInput = document.getElementById('start-time-input');
+const endTimeInput = document.getElementById('end-time-input');
 
 // Buttons
 const btnStartTask = document.getElementById('btn-start-task');
+const btnManualEntry = document.getElementById('btn-manual-entry');
 const btnEndTask = document.getElementById('btn-end-task');
+const themeToggle = document.getElementById('theme-toggle');
+const iconSun = document.getElementById('icon-sun');
+const iconMoon = document.getElementById('icon-moon');
 const btnCancelModal = document.getElementById('btn-cancel-modal');
 const btnDeleteSelected = document.getElementById('btn-delete-selected');
 const btnExportCsv = document.getElementById('btn-export-csv');
@@ -33,11 +40,14 @@ const btnConfirmDelete = document.getElementById('btn-confirm-delete');
 // --- State ---
 let currentTask = null; // { description, startTime }
 let timerInterval = null;
+let editingTaskIndex = null; // Index of task being edited, or null
+let modalMode = 'start'; // 'start', 'manual', 'edit'
 const STORAGE_KEY = 'timeTrackerTasks';
 
 // --- Initialization ---
 function init() {
     loadHistory();
+    initTheme();
 
     // Check if there's a task currently running (persisted in session or just memory if we wanted to go that far, 
     // but for MVP we'll just start fresh or maybe check if we want to support reload persistence later.
@@ -45,16 +55,54 @@ function init() {
 }
 
 // --- Event Listeners ---
-btnStartTask.addEventListener('click', showModal);
+themeToggle.addEventListener('click', toggleTheme);
+btnStartTask.addEventListener('click', () => showModal('start'));
+btnManualEntry.addEventListener('click', () => showModal('manual'));
 btnCancelModal.addEventListener('click', hideModal);
 taskForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const description = taskInput.value.trim();
-    if (description) {
+
+    if (!description) return;
+
+    if (modalMode === 'start') {
         startTask(description);
-        hideModal();
-        taskInput.value = ''; // Reset input
+    } else if (modalMode === 'manual') {
+        const start = new Date(startTimeInput.value).getTime();
+        const end = new Date(endTimeInput.value).getTime();
+
+        if (isNaN(start) || isNaN(end) || start >= end) {
+            alert('Please enter valid start and end times (End time must be after start time).');
+            return;
+        }
+
+        const taskRecord = {
+            taskName: description,
+            startTime: start,
+            endTime: end,
+            durationMs: end - start
+        };
+        saveTask(taskRecord);
+        loadHistory();
+    } else if (modalMode === 'edit') {
+        const start = new Date(startTimeInput.value).getTime();
+        const end = new Date(endTimeInput.value).getTime();
+
+        if (isNaN(start) || isNaN(end) || start >= end) {
+            alert('Please enter valid start and end times.');
+            return;
+        }
+
+        updateTask(editingTaskIndex, {
+            taskName: description,
+            startTime: start,
+            endTime: end,
+            durationMs: end - start
+        });
     }
+
+    hideModal();
+    taskInput.value = '';
 });
 
 btnEndTask.addEventListener('click', endTask);
@@ -79,7 +127,36 @@ taskModal.addEventListener('click', (e) => {
 
 // --- Core Functions ---
 
-function showModal() {
+function showModal(mode = 'start', index = null) {
+    modalMode = mode;
+    editingTaskIndex = index;
+
+    // Reset fields
+    taskInput.value = '';
+    startTimeInput.value = '';
+    endTimeInput.value = '';
+    manualTimeFields.classList.add('hidden');
+
+    if (mode === 'start') {
+        // Default view
+    } else if (mode === 'manual') {
+        manualTimeFields.classList.remove('hidden');
+        // Set default times (e.g., last hour)
+        const now = new Date();
+        const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+        startTimeInput.value = toLocalISOString(oneHourAgo);
+        endTimeInput.value = toLocalISOString(now);
+    } else if (mode === 'edit' && index !== null) {
+        manualTimeFields.classList.remove('hidden');
+        const tasks = getTasks();
+        const task = tasks[index];
+        if (task) {
+            taskInput.value = task.taskName;
+            startTimeInput.value = toLocalISOString(new Date(task.startTime));
+            endTimeInput.value = toLocalISOString(new Date(task.endTime));
+        }
+    }
+
     taskModal.classList.remove('hidden');
     // Small delay to allow display:block to apply before opacity transition
     setTimeout(() => {
@@ -171,6 +248,15 @@ function saveTask(record) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 
+function updateTask(index, updatedRecord) {
+    const tasks = getTasks();
+    if (index >= 0 && index < tasks.length) {
+        tasks[index] = updatedRecord;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+        loadHistory();
+    }
+}
+
 function getTasks() {
     const data = localStorage.getItem(STORAGE_KEY);
     return data ? JSON.parse(data) : [];
@@ -215,7 +301,16 @@ function loadHistory() {
             <td class="px-6 py-4">
                 <input type="checkbox" class="task-checkbox rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" data-index="${index}">
             </td>
-            <td class="px-6 py-4 text-sm text-gray-900 font-medium">${escapeHtml(task.taskName)}</td>
+            <td class="px-6 py-4 text-sm text-gray-900 font-medium">
+                <div class="flex items-center justify-between group">
+                    <span>${escapeHtml(task.taskName)}</span>
+                    <button class="text-gray-400 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity p-1" onclick="showModal('edit', ${index})">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                    </button>
+                </div>
+            </td>
             <td class="px-6 py-4 text-sm text-gray-500">${dateStr}</td>
             <td class="px-6 py-4 text-sm text-gray-500">${startTimeStr}</td>
             <td class="px-6 py-4 text-sm text-gray-500">${endTimeStr}</td>
@@ -371,6 +466,47 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+function toLocalISOString(date) {
+    const offset = date.getTimezoneOffset() * 60000; // offset in milliseconds
+    const localISOTime = (new Date(date - offset)).toISOString().slice(0, -1);
+    return localISOTime.substring(0, 16); // Format: YYYY-MM-DDTHH:MM
+}
+
+// --- Theme Management ---
+
+function initTheme() {
+    // Check local storage or system preference
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        updateThemeIcons(true);
+    } else {
+        document.documentElement.classList.remove('dark');
+        updateThemeIcons(false);
+    }
+}
+
+function toggleTheme() {
+    if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+        updateThemeIcons(false);
+    } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+        updateThemeIcons(true);
+    }
+}
+
+function updateThemeIcons(isDark) {
+    if (isDark) {
+        iconSun.classList.remove('hidden');
+        iconMoon.classList.add('hidden');
+    } else {
+        iconSun.classList.add('hidden');
+        iconMoon.classList.remove('hidden');
+    }
 }
 
 // Run Init
