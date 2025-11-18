@@ -20,6 +20,7 @@ const btnStartTask = document.getElementById('btn-start-task');
 const btnEndTask = document.getElementById('btn-end-task');
 const btnCancelModal = document.getElementById('btn-cancel-modal');
 const btnDeleteSelected = document.getElementById('btn-delete-selected');
+const btnExportCsv = document.getElementById('btn-export-csv');
 const selectAllCheckbox = document.getElementById('select-all-checkbox');
 
 // Delete Modal Elements
@@ -59,6 +60,7 @@ taskForm.addEventListener('submit', (e) => {
 btnEndTask.addEventListener('click', endTask);
 
 btnDeleteSelected.addEventListener('click', showDeleteModal);
+btnExportCsv.addEventListener('click', exportToCSV);
 selectAllCheckbox.addEventListener('change', toggleSelectAll);
 
 // Delete Modal Listeners
@@ -188,10 +190,12 @@ function loadHistory() {
         `;
         selectAllCheckbox.disabled = true;
         selectAllCheckbox.checked = false;
+        btnExportCsv.disabled = true;
         updateDeleteButtonState();
         return;
     }
     selectAllCheckbox.disabled = false;
+    btnExportCsv.disabled = false;
 
     tasks.forEach((task, index) => {
         const row = document.createElement('tr');
@@ -279,6 +283,88 @@ function confirmDelete() {
 
     hideDeleteModal();
     loadHistory();
+}
+
+async function exportToCSV() {
+    const tasks = getTasks();
+
+    if (tasks.length === 0) {
+        return;
+    }
+
+    // CSV Headers
+    const headers = ['Task Name', 'Date', 'Start Time', 'End Time', 'Duration'];
+
+    // Convert tasks to CSV rows
+    const rows = tasks.map(task => {
+        const date = new Date(task.startTime).toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+        const startTime = new Date(task.startTime).toLocaleTimeString(undefined, {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+        const endTime = new Date(task.endTime).toLocaleTimeString(undefined, {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+        const duration = formatTime(task.durationMs);
+
+        // Escape task name for CSV (handle commas and quotes)
+        const escapedTaskName = `"${task.taskName.replace(/"/g, '""')}"`;
+
+        return [escapedTaskName, date, startTime, endTime, duration].join(',');
+    });
+
+    // Combine headers and rows
+    const csvContent = [headers.join(','), ...rows].join('\n');
+
+    // Generate filename with current date
+    const now = new Date();
+    const filename = `time-tracker-export-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}.csv`;
+
+    // Try to use the File System Access API (Save As dialog)
+    if ('showSaveFilePicker' in window) {
+        try {
+            const handle = await window.showSaveFilePicker({
+                suggestedName: filename,
+                types: [{
+                    description: 'CSV File',
+                    accept: { 'text/csv': ['.csv'] },
+                }],
+            });
+            const writable = await handle.createWritable();
+            await writable.write(csvContent);
+            await writable.close();
+            return; // Success
+        } catch (err) {
+            // User cancelled or API failed, fall back to download link if it wasn't a cancel
+            if (err.name !== 'AbortError') {
+                console.error('File Picker failed:', err);
+            } else {
+                return; // User cancelled, don't fallback
+            }
+        }
+    }
+
+    // Fallback: Create blob and download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 }
 
 function escapeHtml(text) {
