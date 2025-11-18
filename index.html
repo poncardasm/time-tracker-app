@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,18 +11,22 @@
         ::-webkit-scrollbar {
             width: 8px;
         }
+
         ::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
+
         ::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
     </style>
 </head>
+
 <body class="bg-gray-100 text-gray-900 font-sans min-h-screen flex flex-col items-center py-10 px-4">
 
     <!-- Header -->
@@ -32,20 +37,25 @@
 
     <!-- Main Action Area -->
     <main class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 mb-8 transition-all duration-300 ease-in-out">
-        
+
         <!-- Start View -->
         <div id="start-view" class="text-center">
             <div class="mb-6">
-                <div class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <div
+                    class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
                 <h2 class="text-2xl font-semibold mb-2">Ready to focus?</h2>
                 <p class="text-gray-500">Start tracking your next task.</p>
             </div>
-            <button id="btn-start-task" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+            <button id="btn-start-task"
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                 Start New Task
             </button>
         </div>
@@ -53,15 +63,18 @@
         <!-- Active Tracking View (Hidden by default) -->
         <div id="active-view" class="hidden text-center">
             <div class="mb-2">
-                <span class="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium tracking-wide uppercase">Now Tracking</span>
+                <span
+                    class="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium tracking-wide uppercase">Now
+                    Tracking</span>
             </div>
             <h3 id="current-task-name" class="text-xl font-medium text-gray-800 mb-6 break-words">Task Name</h3>
-            
+
             <div class="text-6xl font-mono font-bold text-gray-900 mb-8 tracking-wider" id="timer-display">
                 00:00:00
             </div>
 
-            <button id="btn-end-task" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+            <button id="btn-end-task"
+                class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
                 Stop Tracking
             </button>
         </div>
@@ -71,9 +84,10 @@
     <section class="w-full max-w-2xl">
         <div class="flex items-center justify-between mb-4 px-2">
             <h2 class="text-xl font-bold text-gray-800">History</h2>
-            <span id="total-tasks-count" class="text-sm text-gray-500 bg-white px-2 py-1 rounded shadow-sm">0 tasks</span>
+            <span id="total-tasks-count" class="text-sm text-gray-500 bg-white px-2 py-1 rounded shadow-sm">0
+                tasks</span>
         </div>
-        
+
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
@@ -81,13 +95,17 @@
                         <tr>
                             <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
                             <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">Duration</th>
+                            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Start</th>
+                            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">End</th>
+                            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">
+                                Duration</th>
                         </tr>
                     </thead>
                     <tbody id="history-list" class="divide-y divide-gray-200">
                         <!-- History items will be injected here -->
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 text-sm text-gray-500 text-center italic" colspan="3">No tasks recorded yet.</td>
+                            <td class="px-6 py-4 text-sm text-gray-500 text-center italic" colspan="5">No tasks recorded
+                                yet.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -96,17 +114,25 @@
     </section>
 
     <!-- Task Input Modal -->
-    <div id="task-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md transform scale-95 transition-transform duration-300" id="task-modal-content">
+    <div id="task-modal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md transform scale-95 transition-transform duration-300"
+            id="task-modal-content">
             <h3 class="text-2xl font-bold mb-4 text-gray-800">What are you working on?</h3>
             <form id="task-form">
                 <div class="mb-6">
-                    <label for="task-input" class="block text-sm font-medium text-gray-700 mb-2">Task Description</label>
-                    <input type="text" id="task-input" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="e.g., Writing Report" required autofocus>
+                    <label for="task-input" class="block text-sm font-medium text-gray-700 mb-2">Task
+                        Description</label>
+                    <input type="text" id="task-input"
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        placeholder="e.g., Writing Report" required autofocus>
                 </div>
                 <div class="flex items-center justify-end space-x-3">
-                    <button type="button" id="btn-cancel-modal" class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
-                    <button type="submit" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-md transition-colors">Start Tracking</button>
+                    <button type="button" id="btn-cancel-modal"
+                        class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
+                    <button type="submit"
+                        class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-md transition-colors">Start
+                        Tracking</button>
                 </div>
             </form>
         </div>
@@ -114,4 +140,5 @@
 
     <script src="app.js"></script>
 </body>
+
 </html>

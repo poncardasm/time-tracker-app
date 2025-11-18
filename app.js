@@ -28,7 +28,7 @@ const STORAGE_KEY = 'timeTrackerTasks';
 // --- Initialization ---
 function init() {
     loadHistory();
-    
+
     // Check if there's a task currently running (persisted in session or just memory if we wanted to go that far, 
     // but for MVP we'll just start fresh or maybe check if we want to support reload persistence later.
     // For now, simple start.)
@@ -89,7 +89,7 @@ function startTask(description) {
     currentTaskNameEl.textContent = description;
     startView.classList.add('hidden');
     activeView.classList.remove('hidden');
-    
+
     // Start Timer
     updateTimerDisplay(0);
     timerInterval = setInterval(() => {
@@ -123,7 +123,7 @@ function endTask() {
     // Update UI
     activeView.classList.add('hidden');
     startView.classList.remove('hidden');
-    
+
     // Refresh History
     loadHistory();
 }
@@ -158,13 +158,13 @@ function getTasks() {
 function loadHistory() {
     const tasks = getTasks();
     totalTasksCount.textContent = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}`;
-    
+
     historyList.innerHTML = '';
 
     if (tasks.length === 0) {
         historyList.innerHTML = `
             <tr class="hover:bg-gray-50 transition-colors">
-                <td class="px-6 py-4 text-sm text-gray-500 text-center italic" colspan="3">No tasks recorded yet.</td>
+                <td class="px-6 py-4 text-sm text-gray-500 text-center italic" colspan="5">No tasks recorded yet.</td>
             </tr>
         `;
         return;
@@ -173,14 +173,22 @@ function loadHistory() {
     tasks.forEach(task => {
         const row = document.createElement('tr');
         row.className = 'hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0';
-        
-        const date = new Date(task.endTime).toLocaleDateString(undefined, {
-            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+
+        const dateStr = new Date(task.startTime).toLocaleDateString(undefined, {
+            month: 'short', day: 'numeric'
+        });
+        const startTimeStr = new Date(task.startTime).toLocaleTimeString(undefined, {
+            hour: '2-digit', minute: '2-digit'
+        });
+        const endTimeStr = new Date(task.endTime).toLocaleTimeString(undefined, {
+            hour: '2-digit', minute: '2-digit'
         });
 
         row.innerHTML = `
             <td class="px-6 py-4 text-sm text-gray-900 font-medium">${escapeHtml(task.taskName)}</td>
-            <td class="px-6 py-4 text-sm text-gray-500">${date}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">${dateStr}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">${startTimeStr}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">${endTimeStr}</td>
             <td class="px-6 py-4 text-sm text-gray-900 font-mono text-right">${formatTime(task.durationMs)}</td>
         `;
         historyList.appendChild(row);
