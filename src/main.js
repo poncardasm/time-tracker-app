@@ -12,6 +12,7 @@ const taskModal = document.getElementById("task-modal");
 const taskModalContent = document.getElementById("task-modal-content");
 const taskForm = document.getElementById("task-form");
 const taskInput = document.getElementById("task-input");
+const projectInput = document.getElementById("project-input");
 const currentTaskNameEl = document.getElementById("current-task-name");
 const timerDisplay = document.getElementById("timer-display");
 const historyList = document.getElementById("history-list");
@@ -85,12 +86,13 @@ btnCancelModal.addEventListener("click", hideModal);
 taskForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const description = taskInput.value.trim();
+  const project = projectInput.value.trim();
 
   if (!description) return;
 
   if (modalMode === "start") {
     const mode = modePomodoro.checked ? "pomodoro" : "stopwatch";
-    startTask(description, mode);
+    startTask(description, project, mode);
   } else if (modalMode === "manual") {
     const start = new Date(startTimeInput.value).getTime();
     const end = new Date(endTimeInput.value).getTime();
@@ -104,6 +106,7 @@ taskForm.addEventListener("submit", (e) => {
 
     const taskRecord = {
       taskName: description,
+      project: project,
       startTime: start,
       endTime: end,
       durationMs: end - start,
@@ -121,6 +124,7 @@ taskForm.addEventListener("submit", (e) => {
 
     updateTask(editingTaskIndex, {
       taskName: description,
+      project: project,
       startTime: start,
       endTime: end,
       durationMs: end - start,
@@ -129,6 +133,7 @@ taskForm.addEventListener("submit", (e) => {
 
   hideModal();
   taskInput.value = "";
+  projectInput.value = "";
 });
 
 btnEndTask.addEventListener("click", endTask);
@@ -173,6 +178,7 @@ function showModal(mode = "start", index = null) {
 
   // Reset fields
   taskInput.value = "";
+  projectInput.value = "";
   startTimeInput.value = "";
   endTimeInput.value = "";
   manualTimeFields.classList.add("hidden");
@@ -199,6 +205,7 @@ function showModal(mode = "start", index = null) {
     const task = tasks[index];
     if (task) {
       taskInput.value = task.taskName;
+      projectInput.value = task.project || "";
       startTimeInput.value = toLocalISOString(new Date(task.startTime));
       endTimeInput.value = toLocalISOString(new Date(task.endTime));
     }
@@ -223,13 +230,14 @@ function hideModal() {
   }, 300);
 }
 
-function startTask(description, mode = "stopwatch") {
+function startTask(description, project, mode = "stopwatch") {
   // Safety: clear any existing timer
   if (timerInterval) clearInterval(timerInterval);
 
   const now = Date.now();
   currentTask = {
     description,
+    project,
     startTime: now,
     mode,
   };
@@ -316,6 +324,7 @@ function endTask() {
   // Create Record
   const taskRecord = {
     taskName: currentTask.description,
+    project: currentTask.project,
     startTime: currentTask.startTime,
     endTime: now,
     durationMs: duration,
@@ -382,7 +391,7 @@ function loadHistory() {
   if (tasks.length === 0) {
     historyList.innerHTML = `
             <tr>
-                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 text-center italic" colspan="6">No tasks recorded yet.</td>
+                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 text-center italic" colspan="7">No tasks recorded yet.</td>
             </tr>
         `;
     selectAllCheckbox.disabled = true;
@@ -436,6 +445,9 @@ function loadHistory() {
                     </button>
                 </div>
             </td>
+            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">${escapeHtml(
+              task.project || "-"
+            )}</td>
             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">${dateStr}</td>
             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">${startTimeStr}</td>
             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">${endTimeStr}</td>
@@ -532,7 +544,14 @@ async function exportToCSV() {
   }
 
   // CSV Headers
-  const headers = ["Task Name", "Date", "Start Time", "End Time", "Duration"];
+  const headers = [
+    "Task Name",
+    "Project",
+    "Date",
+    "Start Time",
+    "End Time",
+    "Duration",
+  ];
 
   // Convert tasks to CSV rows
   const rows = tasks.map((task) => {
@@ -557,8 +576,16 @@ async function exportToCSV() {
 
     // Escape task name for CSV (handle commas and quotes)
     const escapedTaskName = `"${task.taskName.replace(/"/g, '""')}"`;
+    const escapedProject = `"${(task.project || "").replace(/"/g, '""')}"`;
 
-    return [escapedTaskName, date, startTime, endTime, duration].join(",");
+    return [
+      escapedTaskName,
+      escapedProject,
+      date,
+      startTime,
+      endTime,
+      duration,
+    ].join(",");
   });
 
   // Combine headers and rows
