@@ -1,12 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { toLocalISOString } from "../utils";
 
-export function TaskModal({ isOpen, onClose, mode, initialData, onSubmit }) {
+export function TaskModal({
+  isOpen,
+  onClose,
+  mode,
+  initialData,
+  tasks,
+  onSubmit,
+}) {
   const [description, setDescription] = useState("");
   const [project, setProject] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [timerMode, setTimerMode] = useState("stopwatch");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+
+  const suggestedProjects = useMemo(() => {
+    if (!tasks) return [];
+    const uniqueProjects = new Set();
+    const suggestions = [];
+    for (const task of tasks) {
+      if (task.project && !uniqueProjects.has(task.project)) {
+        uniqueProjects.add(task.project);
+        suggestions.push(task.project);
+        if (suggestions.length >= 10) break;
+      }
+    }
+    return suggestions;
+  }, [tasks]);
+
+  const filteredProjects = useMemo(() => {
+    if (!project.trim()) return suggestedProjects;
+    return suggestedProjects.filter((p) =>
+      p.toLowerCase().includes(project.toLowerCase())
+    );
+  }, [project, suggestedProjects]);
 
   useEffect(() => {
     if (isOpen) {
@@ -130,13 +159,37 @@ export function TaskModal({ isOpen, onClose, mode, initialData, onSubmit }) {
               Project{" "}
               <span className="text-gray-400 font-normal">(Optional)</span>
             </label>
-            <input
-              type="text"
-              value={project}
-              onChange={(e) => setProject(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition-all"
-              placeholder="e.g., Client Work"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={project}
+                onChange={(e) => {
+                  setProject(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition-all"
+                placeholder="e.g., Client Work"
+              />
+              {showSuggestions && filteredProjects.length > 0 && (
+                <ul className="absolute z-10 w-full bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg mt-1 max-h-40 overflow-y-auto shadow-lg">
+                  {filteredProjects.map((proj) => (
+                    <li
+                      key={proj}
+                      className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-600 cursor-pointer text-gray-800 dark:text-gray-200"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        setProject(proj);
+                        setShowSuggestions(false);
+                      }}
+                    >
+                      {proj}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
 
           {(mode === "manual" || mode === "edit") && (
