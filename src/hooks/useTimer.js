@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { playNotificationSound, initializeAudioContext } from '../utils';
 
 export function useTimer() {
   const [activeTask, setActiveTask] = useState(null); // { description, project, startTime, mode }
@@ -48,6 +49,9 @@ export function useTimer() {
        if ('Notification' in window && Notification.permission === 'default') {
         Notification.requestPermission();
       }
+      
+      // Initialize audio context on user interaction (unlock audio)
+      initializeAudioContext();
     }
   };
 
@@ -87,13 +91,14 @@ export function useTimer() {
                  const nextPhase = prev.phase === 'work' ? 'break' : 'work';
                  const nextDuration = nextPhase === 'work' ? prev.workDuration : prev.breakDuration;
                  
-                 notifyUser(
-                     nextPhase === 'break' ? "Time for a break!" : "Back to work!",
-                     nextPhase === 'break' ? "Great work! Take 5 minutes to recharge." : "Break is over. Let's focus!"
-                 );
+                notifyUser(
+                    nextPhase === 'break' ? "Time for a break!" : "Back to work!",
+                    nextPhase === 'break' ? "Great work! Take 5 minutes to recharge." : "Break is over. Let's focus!"
+                );
+                playNotificationSound();
 
-                 return {
-                     ...prev,
+                return {
+                    ...prev,
                      phase: nextPhase,
                      remaining: nextDuration
                  };
