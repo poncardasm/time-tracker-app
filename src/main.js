@@ -287,7 +287,7 @@ function loadHistory() {
 
     tasks.forEach((task, index) => {
         const row = document.createElement('tr');
-        const zebraClass = index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50 dark:bg-slate-750';
+        const zebraClass = index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50 dark:bg-slate-700';
         row.className = `${zebraClass} border-b border-gray-100 dark:border-slate-700 last:border-0`;
 
         const dateStr = new Date(task.startTime).toLocaleDateString(undefined, {

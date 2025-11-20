@@ -1,0 +1,226 @@
+---
+description: Time Tracker App - Project rules for vanilla JS PWA with Vite and Tailwind CSS
+globs: []
+alwaysApply: true
+---
+
+# Time Tracker App - Agent Instructions
+
+## Project Overview
+
+This is a minimalist Progressive Web App (PWA) for time tracking built with vanilla JavaScript, Vite, and Tailwind CSS. The app follows a single-page application pattern with no framework dependencies.
+
+## Tech Stack
+
+- **Build Tool**: Vite 6.x
+- **Styling**: Tailwind CSS 4.1.x with CSS-first configuration
+- **Frontend**: Vanilla JavaScript (ES6+ modules)
+- **PWA**: Service Worker with network-first caching strategy
+- **Storage**: Browser localStorage (no backend/server)
+
+## Architecture Principles
+
+### Code Organization
+
+- **Single HTML file**: All markup lives in `index.html` at the root
+- **Single JS entry point**: All application logic in `src/main.js`
+- **CSS**: Tailwind utilities imported in `src/main.css` with minimal custom styles
+- **Separation of concerns**: Organize code into clear sections:
+  - DOM element references
+  - State management
+  - Event listeners
+  - Core functions
+  - Persistence layer
+  - UI utilities
+
+### Code Style
+
+#### JavaScript
+
+- Use ES6+ modules (`import`/`export`)
+- Use `const` for variables, `let` only when reassignment is needed
+- Use arrow functions for callbacks and short functions
+- Use template literals for string interpolation
+- Use descriptive variable names: `currentTask`, `timerInterval`, `taskModal`
+- Use camelCase for variables and functions: `startTask()`, `updateTimerDisplay()`
+- Use UPPER_SNAKE_CASE for constants: `STORAGE_KEY`
+- Prefer functional programming patterns where appropriate
+- Add comments for complex logic or non-obvious behavior
+- Group related code with section comments: `// --- DOM Elements ---`
+
+#### HTML/CSS
+
+- Use kebab-case for HTML IDs and classes: `btn-start-task`, `task-modal`
+- Use semantic HTML5 elements
+- Prefer Tailwind utility classes over custom CSS
+- Use Tailwind's dark mode classes: `dark:bg-slate-800`, `dark:text-white`
+- Ensure all interactive elements have proper focus states
+- Use transition classes for smooth animations: `transition-colors duration-300`
+
+#### Naming Conventions
+
+- DOM elements: descriptive IDs prefixed by type (`btn-`, `modal-`, `input-`, `icon-`)
+- Functions: verb-based names (`startTask`, `hideModal`, `loadHistory`)
+- State variables: descriptive names (`currentTask`, `modalMode`, `editingTaskIndex`)
+- Storage keys: descriptive constants (`STORAGE_KEY`)
+
+## File Structure
+
+```
+time-tracker-app/
+├── index.html              # Main HTML (all markup)
+├── src/
+│   ├── main.js            # Application logic (all JS)
+│   └── main.css           # Tailwind imports + minimal custom styles
+├── public/
+│   ├── sw.js              # Service Worker
+│   ├── manifest.json      # PWA manifest
+│   └── *.svg              # App icons
+├── dist/                  # Build output (gitignored)
+└── vite.config.js         # Vite configuration
+```
+
+## Development Guidelines
+
+### Adding New Features
+
+1. **UI Elements**: Add HTML markup to `index.html` in the appropriate section
+2. **DOM References**: Add element references at the top of `main.js` in the DOM Elements section
+3. **Event Listeners**: Add listeners in the Event Listeners section
+4. **Logic**: Implement functions in the Core Functions section
+5. **State**: Add state variables at the top in the State section
+6. **Persistence**: Use localStorage with the existing `STORAGE_KEY` pattern
+
+### Styling Guidelines
+
+- **Primary color**: Indigo (`indigo-600`, `indigo-700`, etc.)
+- **Accent colors**:
+  - Success/Active: Green (`green-100`, `green-800`)
+  - Danger/Delete: Red (`red-500`, `red-600`)
+- **Dark mode**: Always provide dark mode variants using Tailwind's `dark:` prefix
+- **Spacing**: Use Tailwind's spacing scale (p-4, mb-6, space-x-3)
+- **Typography**: Use Tailwind's font utilities (`font-bold`, `text-sm`, `text-2xl`)
+- **Shadows**: Use `shadow-lg`, `shadow-xl`, `shadow-2xl` for depth
+- **Rounded corners**: Use `rounded-xl` or `rounded-2xl` for modern look
+- **Transitions**: Always include transitions for interactive elements
+
+### PWA Considerations
+
+- **Service Worker**: Update `CACHE_NAME` version when making significant changes
+- **Manifest**: Keep `manifest.json` updated with app metadata
+- **Offline support**: Ensure core functionality works offline
+- **Icons**: Provide both 192x192 and 512x512 SVG icons
+- **Theme color**: Match `theme-color` meta tag to primary color
+
+### State Management
+
+- Use module-level variables for application state
+- Persist important state to localStorage
+- Clear state appropriately when tasks end or are deleted
+- Handle edge cases (empty state, invalid data, etc.)
+
+### Error Handling
+
+- Validate user input before processing
+- Provide user-friendly error messages
+- Handle localStorage quota exceeded errors gracefully
+- Validate date/time inputs for manual entries
+
+### Accessibility
+
+- Use semantic HTML elements (`<button>`, `<form>`, `<label>`)
+- Ensure all interactive elements are keyboard accessible
+- Provide proper ARIA labels when needed
+- Maintain focus management in modals
+- Use sufficient color contrast (Tailwind handles this)
+
+### Performance
+
+- Debounce rapid UI updates if needed
+- Clear intervals/timeouts when components unmount
+- Minimize DOM queries (cache element references)
+- Use efficient localStorage operations (batch when possible)
+
+## Common Patterns
+
+### Modal Pattern
+
+```javascript
+function showModal(mode) {
+  modalMode = mode;
+  taskModal.classList.remove("hidden");
+  setTimeout(() => {
+    taskModal.classList.remove("opacity-0");
+    taskModalContent.classList.remove("scale-95");
+  }, 10);
+}
+
+function hideModal() {
+  taskModal.classList.add("opacity-0");
+  taskModalContent.classList.add("scale-95");
+  setTimeout(() => {
+    taskModal.classList.add("hidden");
+  }, 300);
+}
+```
+
+### Time Formatting
+
+```javascript
+function formatTime(ms) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const pad = (num) => num.toString().padStart(2, "0");
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}
+```
+
+### localStorage Pattern
+
+```javascript
+const STORAGE_KEY = "timeTrackerTasks";
+
+function getTasks() {
+  const data = localStorage.getItem(STORAGE_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+function saveTask(record) {
+  const tasks = getTasks();
+  tasks.unshift(record); // Newest first
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+```
+
+## What NOT to Do
+
+- ❌ Don't introduce frameworks (React, Vue, etc.) - keep it vanilla JS
+- ❌ Don't add unnecessary dependencies
+- ❌ Don't create separate component files - keep it in main.js
+- ❌ Don't use inline styles - use Tailwind classes
+- ❌ Don't hardcode colors - use Tailwind's color system
+- ❌ Don't forget dark mode variants
+- ❌ Don't skip transitions/animations for interactive elements
+- ❌ Don't use `var` - use `const` or `let`
+- ❌ Don't forget to escape HTML in user-generated content (`escapeHtml()`)
+- ❌ Don't store sensitive data in localStorage
+- ❌ Don't break offline functionality when adding features
+
+## Testing Considerations
+
+- Test with localStorage cleared (empty state)
+- Test dark mode toggle
+- Test offline functionality
+- Test on mobile viewport sizes
+- Test with very long task names
+- Test date/time edge cases (past dates, future dates, invalid ranges)
+- Test CSV export with special characters
+
+## Build & Deployment
+
+- Run `npm run build` to create production build
+- Output goes to `dist/` directory
+- Ensure service worker is properly configured for production
+- Test PWA installation on target devices
