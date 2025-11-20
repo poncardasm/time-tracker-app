@@ -1,5 +1,5 @@
 ---
-description: Time Tracker App - Project rules for vanilla JS PWA with Vite and Tailwind CSS
+description: Time Tracker App - Project rules for React PWA with Vite and Tailwind CSS
 globs: []
 alwaysApply: true
 ---
@@ -8,13 +8,13 @@ alwaysApply: true
 
 ## Project Overview
 
-This is a minimalist Progressive Web App (PWA) for time tracking built with vanilla JavaScript, Vite, and Tailwind CSS. The app follows a single-page application pattern with no framework dependencies.
+This is a minimalist Progressive Web App (PWA) for time tracking built with React, Vite, and Tailwind CSS.
 
 ## Tech Stack
 
 - **Build Tool**: Vite 6.x
 - **Styling**: Tailwind CSS 4.1.x with CSS-first configuration
-- **Frontend**: Vanilla JavaScript (ES6+ modules)
+- **Frontend**: React (Functional Components with Hooks)
 - **PWA**: Service Worker with network-first caching strategy
 - **Storage**: Browser localStorage (no backend/server)
 
@@ -22,35 +22,29 @@ This is a minimalist Progressive Web App (PWA) for time tracking built with vani
 
 ### Code Organization
 
-- **Single HTML file**: All markup lives in `index.html` at the root
-- **Single JS entry point**: All application logic in `src/main.js`
-- **CSS**: Tailwind utilities imported in `src/main.css` with minimal custom styles
-- **Separation of concerns**: Organize code into clear sections:
-  - DOM element references
-  - State management
-  - Event listeners
-  - Core functions
-  - Persistence layer
-  - UI utilities
+- **Entry Point**: `src/main.jsx` renders `src/App.jsx`
+- **Components**: `src/components/` for UI components (e.g., `Header`, `TaskModal`, `HistoryList`)
+- **Hooks**: `src/hooks/` for business logic (e.g., `useTimer`, `useTasks`, `useTheme`)
+- **Utilities**: `src/utils.js` for helper functions
+- **CSS**: Tailwind utilities imported in `src/main.css`
 
 ### Code Style
 
-#### JavaScript
+#### JavaScript/React
 
 - Use ES6+ modules (`import`/`export`)
+- Use functional components with Hooks (`useState`, `useEffect`, `useRef`, `useCallback`)
 - Use `const` for variables, `let` only when reassignment is needed
-- Use arrow functions for callbacks and short functions
-- Use template literals for string interpolation
+- Use arrow functions for event handlers and effects
 - Use descriptive variable names: `currentTask`, `timerInterval`, `taskModal`
 - Use camelCase for variables and functions: `startTask()`, `updateTimerDisplay()`
 - Use UPPER_SNAKE_CASE for constants: `STORAGE_KEY`
-- Prefer functional programming patterns where appropriate
-- Add comments for complex logic or non-obvious behavior
-- Group related code with section comments: `// --- DOM Elements ---`
+- Avoid direct DOM manipulation; use React state and refs
+- Group related code with section comments if needed
 
-#### HTML/CSS
+#### HTML/CSS (JSX)
 
-- Use kebab-case for HTML IDs and classes: `btn-start-task`, `task-modal`
+- Use `className` instead of `class`
 - Use semantic HTML5 elements
 - Prefer Tailwind utility classes over custom CSS
 - Use Tailwind's dark mode classes: `dark:bg-slate-800`, `dark:text-white`
@@ -59,19 +53,32 @@ This is a minimalist Progressive Web App (PWA) for time tracking built with vani
 
 #### Naming Conventions
 
-- DOM elements: descriptive IDs prefixed by type (`btn-`, `modal-`, `input-`, `icon-`)
-- Functions: verb-based names (`startTask`, `hideModal`, `loadHistory`)
-- State variables: descriptive names (`currentTask`, `modalMode`, `editingTaskIndex`)
-- Storage keys: descriptive constants (`STORAGE_KEY`)
+- Components: PascalCase (`TaskModal`, `HistoryList`)
+- Hooks: camelCase prefixed with `use` (`useTimer`, `useTasks`)
+- Props: camelCase (`isOpen`, `onClose`, `activeTask`)
+- State variables: descriptive names (`currentTask`, `isModalOpen`)
 
 ## File Structure
 
 ```
 time-tracker-app/
-├── index.html              # Main HTML (all markup)
+├── index.html              # Main HTML (root div)
 ├── src/
-│   ├── main.js            # Application logic (all JS)
-│   └── main.css           # Tailwind imports + minimal custom styles
+│   ├── main.jsx           # Entry Point
+│   ├── App.jsx            # Main Application Shell
+│   ├── main.css           # Tailwind imports
+│   ├── utils.js           # Helper functions
+│   ├── components/        # UI Components
+│   │   ├── Header.jsx
+│   │   ├── StartView.jsx
+│   │   ├── ActiveView.jsx
+│   │   ├── HistoryList.jsx
+│   │   ├── TaskModal.jsx
+│   │   └── DeleteModal.jsx
+│   └── hooks/             # Custom Hooks
+│       ├── useTasks.js
+│       ├── useTimer.js
+│       └── useTheme.js
 ├── public/
 │   ├── sw.js              # Service Worker
 │   ├── manifest.json      # PWA manifest
@@ -84,143 +91,137 @@ time-tracker-app/
 
 ### Adding New Features
 
-1. **UI Elements**: Add HTML markup to `index.html` in the appropriate section
-2. **DOM References**: Add element references at the top of `main.js` in the DOM Elements section
-3. **Event Listeners**: Add listeners in the Event Listeners section
-4. **Logic**: Implement functions in the Core Functions section
-5. **State**: Add state variables at the top in the State section
-6. **Persistence**: Use localStorage with the existing `STORAGE_KEY` pattern
+1.  **Component**: Create a new component in `src/components/` if needed
+2.  **Logic**: Add business logic to existing hooks or create a new hook in `src/hooks/`
+3.  **State**: Manage state within hooks or `App.jsx` (avoid global state if possible)
+4.  **Persistence**: Use localStorage through `useTasks` hook
+5.  **Integration**: Import and use the component/hook in `App.jsx`
 
 ### Styling Guidelines
 
-- **Primary color**: Indigo (`indigo-600`, `indigo-700`, etc.)
-- **Accent colors**:
-  - Success/Active: Green (`green-100`, `green-800`)
-  - Danger/Delete: Red (`red-500`, `red-600`)
-- **Dark mode**: Always provide dark mode variants using Tailwind's `dark:` prefix
-- **Spacing**: Use Tailwind's spacing scale (p-4, mb-6, space-x-3)
-- **Typography**: Use Tailwind's font utilities (`font-bold`, `text-sm`, `text-2xl`)
-- **Shadows**: Use `shadow-lg`, `shadow-xl`, `shadow-2xl` for depth
-- **Rounded corners**: Use `rounded-xl` or `rounded-2xl` for modern look
-- **Transitions**: Always include transitions for interactive elements
+-   **Primary color**: Indigo (`indigo-600`, `indigo-700`, etc.)
+-   **Accent colors**:
+    -   Success/Active: Green (`green-100`, `green-800`)
+    -   Danger/Delete: Red (`red-500`, `red-600`)
+-   **Dark mode**: Always provide dark mode variants using Tailwind's `dark:` prefix
+-   **Spacing**: Use Tailwind's spacing scale (p-4, mb-6, space-x-3)
+-   **Typography**: Use Tailwind's font utilities (`font-bold`, `text-sm`, `text-2xl`)
+-   **Shadows**: Use `shadow-lg`, `shadow-xl`, `shadow-2xl` for depth
+-   **Rounded corners**: Use `rounded-xl` or `rounded-2xl` for modern look
+-   **Transitions**: Always include transitions for interactive elements
 
 ### PWA Considerations
 
-- **Service Worker**: Update `CACHE_NAME` version when making significant changes
-- **Manifest**: Keep `manifest.json` updated with app metadata
-- **Offline support**: Ensure core functionality works offline
-- **Icons**: Provide both 192x192 and 512x512 SVG icons
-- **Theme color**: Match `theme-color` meta tag to primary color
+-   **Service Worker**: Update `CACHE_NAME` version when making significant changes
+-   **Manifest**: Keep `manifest.json` updated with app metadata
+-   **Offline support**: Ensure core functionality works offline
+-   **Icons**: Provide both 192x192 and 512x512 SVG icons
+-   **Theme color**: Match `theme-color` meta tag to primary color
 
 ### State Management
 
-- Use module-level variables for application state
-- Persist important state to localStorage
-- Clear state appropriately when tasks end or are deleted
-- Handle edge cases (empty state, invalid data, etc.)
+-   Use custom hooks to encapsulate logic and state
+-   Persist important state to localStorage (`useTasks`, `useTheme`)
+-   Clear state appropriately when tasks end or are deleted
+-   Handle edge cases (empty state, invalid data, etc.)
 
 ### Error Handling
 
-- Validate user input before processing
-- Provide user-friendly error messages
-- Handle localStorage quota exceeded errors gracefully
-- Validate date/time inputs for manual entries
+-   Validate user input before processing
+-   Provide user-friendly error messages (e.g., `alert` or toast)
+-   Handle localStorage quota exceeded errors gracefully
+-   Validate date/time inputs for manual entries
 
 ### Accessibility
 
-- Use semantic HTML elements (`<button>`, `<form>`, `<label>`)
-- Ensure all interactive elements are keyboard accessible
-- Provide proper ARIA labels when needed
-- Maintain focus management in modals
-- Use sufficient color contrast (Tailwind handles this)
+-   Use semantic HTML elements (`<button>`, `<form>`, `<label>`)
+-   Ensure all interactive elements are keyboard accessible
+-   Provide proper ARIA labels when needed
+-   Maintain focus management in modals
+-   Use sufficient color contrast (Tailwind handles this)
 
 ### Performance
 
-- Debounce rapid UI updates if needed
-- Clear intervals/timeouts when components unmount
-- Minimize DOM queries (cache element references)
-- Use efficient localStorage operations (batch when possible)
+-   Debounce rapid UI updates if needed
+-   Clear intervals/timeouts when components unmount (`useEffect` cleanup)
+-   Minimize re-renders using `React.memo` or `useCallback` if necessary (optimization)
+-   Use efficient localStorage operations
 
 ## Common Patterns
 
-### Modal Pattern
+### Custom Hook Pattern
 
 ```javascript
-function showModal(mode) {
-  modalMode = mode;
-  taskModal.classList.remove("hidden");
-  setTimeout(() => {
-    taskModal.classList.remove("opacity-0");
-    taskModalContent.classList.remove("scale-95");
-  }, 10);
-}
+export function useMyFeature() {
+  const [state, setState] = useState(initialState);
 
-function hideModal() {
-  taskModal.classList.add("opacity-0");
-  taskModalContent.classList.add("scale-95");
-  setTimeout(() => {
-    taskModal.classList.add("hidden");
-  }, 300);
+  useEffect(() => {
+    // Side effects
+    return () => {
+      // Cleanup
+    };
+  }, [dependencies]);
+
+  const handler = () => {
+    // Logic
+  };
+
+  return { state, handler };
 }
 ```
 
-### Time Formatting
+### Component Pattern
 
 ```javascript
-function formatTime(ms) {
-  const totalSeconds = Math.floor(ms / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  const pad = (num) => num.toString().padStart(2, "0");
-  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+export function MyComponent({ prop1, onAction }) {
+  return (
+    <div className="class-name">
+      <h1>{prop1}</h1>
+      <button onClick={onAction}>Action</button>
+    </div>
+  );
 }
 ```
 
-### localStorage Pattern
+### localStorage Pattern (in Hooks)
 
 ```javascript
-const STORAGE_KEY = "timeTrackerTasks";
+const STORAGE_KEY = "timeTrackerData";
 
-function getTasks() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : [];
-}
+const [data, setData] = useState(() => {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored ? JSON.parse(stored) : initialData;
+});
 
-function saveTask(record) {
-  const tasks = getTasks();
-  tasks.unshift(record); // Newest first
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-}
+useEffect(() => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}, [data]);
 ```
 
 ## What NOT to Do
 
-- ❌ Don't introduce frameworks (React, Vue, etc.) - keep it vanilla JS
-- ❌ Don't add unnecessary dependencies
-- ❌ Don't create separate component files - keep it in main.js
-- ❌ Don't use inline styles - use Tailwind classes
-- ❌ Don't hardcode colors - use Tailwind's color system
-- ❌ Don't forget dark mode variants
-- ❌ Don't skip transitions/animations for interactive elements
-- ❌ Don't use `var` - use `const` or `let`
-- ❌ Don't forget to escape HTML in user-generated content (`escapeHtml()`)
-- ❌ Don't store sensitive data in localStorage
-- ❌ Don't break offline functionality when adding features
+-   ❌ Don't use `var` - use `const` or `let`
+-   ❌ Don't use inline styles - use Tailwind classes
+-   ❌ Don't hardcode colors - use Tailwind's color system
+-   ❌ Don't forget dark mode variants
+-   ❌ Don't skip transitions/animations for interactive elements
+-   ❌ Don't store sensitive data in localStorage
+-   ❌ Don't break offline functionality when adding features
+-   ❌ Don't directly manipulate the DOM (use Refs if absolutely necessary)
 
 ## Testing Considerations
 
-- Test with localStorage cleared (empty state)
-- Test dark mode toggle
-- Test offline functionality
-- Test on mobile viewport sizes
-- Test with very long task names
-- Test date/time edge cases (past dates, future dates, invalid ranges)
-- Test CSV export with special characters
+-   Test with localStorage cleared (empty state)
+-   Test dark mode toggle
+-   Test offline functionality
+-   Test on mobile viewport sizes
+-   Test with very long task names
+-   Test date/time edge cases (past dates, future dates, invalid ranges)
+-   Test CSV export with special characters
 
 ## Build & Deployment
 
-- Run `npm run build` to create production build
-- Output goes to `dist/` directory
-- Ensure service worker is properly configured for production
-- Test PWA installation on target devices
+-   Run `npm run build` to create production build
+-   Output goes to `dist/` directory
+-   Ensure service worker is properly configured for production
+-   Test PWA installation on target devices
