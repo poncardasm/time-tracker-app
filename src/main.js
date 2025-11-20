@@ -267,7 +267,7 @@ function notifyUser(title, body) {
 
 function updatePomodoroStatusDisplay() {
     if (pomodoroState.phase === 'work') {
-        pomodoroPhaseText.textContent = 'Work Phase';
+        pomodoroPhaseText.textContent = 'Focus Time';
         pomodoroPhaseText.className = 'inline-block px-3 py-1 bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 rounded-full text-xs font-bold uppercase tracking-wider';
     } else {
         pomodoroPhaseText.textContent = 'Break Phase';
