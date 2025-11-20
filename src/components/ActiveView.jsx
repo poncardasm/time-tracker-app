@@ -32,7 +32,7 @@ export function ActiveView({ activeTask, elapsedMs, pomodoroState, onStop }) {
         {description}
       </h3>
 
-      <div className="text-6xl font-mono font-bold text-gray-900 dark:text-white mb-8 tracking-wider">
+      <div id="timer-display" className="text-6xl font-mono font-bold text-gray-900 dark:text-white mb-8 tracking-wider">
         {formatTime(displayTime)}
       </div>
 

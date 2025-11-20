@@ -109,6 +109,23 @@ export function useTimer() {
     };
   }, [activeTask]);
 
+  // Prevent accidental tab close when task is active
+  useEffect(() => {
+    if (!activeTask) return;
+
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = 'You have an active task timer running. Are you sure you want to leave?';
+      return event.returnValue;
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [activeTask]);
+
   return {
       activeTask,
       elapsedMs,
