@@ -19,6 +19,11 @@ const totalTasksCount = document.getElementById('total-tasks-count');
 const manualTimeFields = document.getElementById('manual-time-fields');
 const startTimeInput = document.getElementById('start-time-input');
 const endTimeInput = document.getElementById('end-time-input');
+const modeStopwatch = document.getElementById('mode-stopwatch');
+const modePomodoro = document.getElementById('mode-pomodoro');
+const pomodoroStatus = document.getElementById('pomodoro-status');
+const pomodoroPhaseText = document.getElementById('pomodoro-phase-text');
+const timerModeContainer = document.getElementById('timer-mode-selection');
 
 // Buttons
 const btnStartTask = document.getElementById('btn-start-task');
@@ -40,10 +45,17 @@ const btnCancelDelete = document.getElementById('btn-cancel-delete');
 const btnConfirmDelete = document.getElementById('btn-confirm-delete');
 
 // --- State ---
-let currentTask = null; // { description, startTime }
+let currentTask = null; // { description, startTime, mode }
 let timerInterval = null;
 let editingTaskIndex = null; // Index of task being edited, or null
 let modalMode = 'start'; // 'start', 'manual', 'edit'
+let timerMode = 'stopwatch'; // 'stopwatch', 'pomodoro'
+let pomodoroState = {
+    phase: 'work', // 'work', 'break'
+    remaining: 0,
+    workDuration: 25 * 60 * 1000,
+    breakDuration: 5 * 60 * 1000
+};
 const STORAGE_KEY = 'timeTrackerTasks';
 
 // --- Initialization ---
@@ -68,7 +80,8 @@ taskForm.addEventListener('submit', (e) => {
     if (!description) return;
 
     if (modalMode === 'start') {
-        startTask(description);
+        const mode = modePomodoro.checked ? 'pomodoro' : 'stopwatch';
+        startTask(description, mode);
     } else if (modalMode === 'manual') {
         const start = new Date(startTimeInput.value).getTime();
         const end = new Date(endTimeInput.value).getTime();
@@ -138,8 +151,15 @@ function showModal(mode = 'start', index = null) {
     startTimeInput.value = '';
     endTimeInput.value = '';
     manualTimeFields.classList.add('hidden');
+    
+    if (timerModeContainer) {
+        timerModeContainer.classList.add('hidden');
+    }
 
     if (mode === 'start') {
+        if (timerModeContainer) {
+            timerModeContainer.classList.remove('hidden');
+        }
         // Default view
     } else if (mode === 'manual') {
         manualTimeFields.classList.remove('hidden');
@@ -178,24 +198,81 @@ function hideModal() {
     }, 300);
 }
 
-function startTask(description) {
+function startTask(description, mode = 'stopwatch') {
+    // Safety: clear any existing timer
+    if (timerInterval) clearInterval(timerInterval);
+
     const now = Date.now();
     currentTask = {
         description,
-        startTime: now
+        startTime: now,
+        mode
     };
+    timerMode = mode;
 
     // Update UI
     currentTaskNameEl.textContent = description;
     startView.classList.add('hidden');
     activeView.classList.remove('hidden');
 
+    // Initialize Timer Display
+    if (timerMode === 'pomodoro') {
+        pomodoroState.phase = 'work';
+        pomodoroState.remaining = pomodoroState.workDuration;
+        pomodoroStatus.classList.remove('hidden');
+        updatePomodoroStatusDisplay();
+        updateTimerDisplay(pomodoroState.remaining);
+        
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    } else {
+        pomodoroStatus.classList.add('hidden');
+        updateTimerDisplay(0);
+    }
+
     // Start Timer
-    updateTimerDisplay(0);
     timerInterval = setInterval(() => {
-        const elapsed = Date.now() - currentTask.startTime;
-        updateTimerDisplay(elapsed);
+        if (timerMode === 'pomodoro') {
+            pomodoroState.remaining -= 1000;
+            
+            // Handle phase switch
+            if (pomodoroState.remaining <= 0) {
+                if (pomodoroState.phase === 'work') {
+                    pomodoroState.phase = 'break';
+                    pomodoroState.remaining = pomodoroState.breakDuration;
+                    notifyUser("Time for a break!", "Great work! Take 5 minutes to recharge.");
+                } else {
+                    pomodoroState.phase = 'work';
+                    pomodoroState.remaining = pomodoroState.workDuration;
+                    notifyUser("Back to work!", "Break is over. Let's focus!");
+                }
+                updatePomodoroStatusDisplay();
+            }
+            
+            updateTimerDisplay(pomodoroState.remaining);
+        } else {
+            const elapsed = Date.now() - currentTask.startTime;
+            updateTimerDisplay(elapsed);
+        }
     }, 1000);
+}
+
+function notifyUser(title, body) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, { body, icon: '/icon-192.svg' });
+    }
+}
+
+function updatePomodoroStatusDisplay() {
+    if (pomodoroState.phase === 'work') {
+        pomodoroPhaseText.textContent = 'Work Phase';
+        pomodoroPhaseText.className = 'inline-block px-3 py-1 bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 rounded-full text-xs font-bold uppercase tracking-wider';
+    } else {
+        pomodoroPhaseText.textContent = 'Break Phase';
+        pomodoroPhaseText.className = 'inline-block px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs font-bold uppercase tracking-wider';
+    }
 }
 
 function endTask() {
