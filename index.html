@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#6366f1" />
+    <meta name="theme-color" content="#0891b2" />
     <meta name="description" content="A minimalist time tracking application" />
     <link rel="manifest" href="manifest.json" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -57,7 +57,7 @@
         </svg>
       </button>
       <h1
-        class="text-4xl font-bold text-indigo-600 dark:text-indigo-400 tracking-tight"
+        class="text-4xl font-bold text-cyan-600 dark:text-cyan-400 tracking-tight"
       >
         Time Tracker
       </h1>
@@ -74,7 +74,7 @@
       <div id="start-view" class="text-center">
         <div class="mb-6">
           <div
-            class="w-20 h-20 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center mx-auto mb-4"
+            class="w-20 h-20 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 rounded-full flex items-center justify-center mx-auto mb-4"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -104,13 +104,13 @@
         </div>
         <button
           id="btn-start-task"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          class="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
         >
           Start New Task
         </button>
         <button
           id="btn-manual-entry"
-          class="w-full mt-3 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium transition-colors focus:outline-none focus:underline"
+          class="w-full mt-3 text-sm text-cyan-600 dark:text-cyan-400 hover:text-cyan-800 dark:hover:text-cyan-300 font-medium transition-colors focus:outline-none focus:underline"
         >
           Manual Entry
         </button>
@@ -162,7 +162,7 @@
         <div class="flex items-center space-x-4">
           <button
             id="btn-export-csv"
-            class="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="text-sm text-cyan-600 hover:text-cyan-800 dark:text-cyan-400 dark:hover:text-cyan-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             disabled
           >
             Export to CSV
@@ -181,14 +181,14 @@
         <div class="overflow-x-auto">
           <table class="w-full text-left">
             <thead
-              class="bg-indigo-600 dark:bg-indigo-700 border-b border-indigo-700 dark:border-indigo-800"
+              class="bg-cyan-600 dark:bg-cyan-700 border-b border-cyan-700 dark:border-cyan-800"
             >
               <tr>
                 <th class="px-6 py-3 w-10">
                   <input
                     type="checkbox"
                     id="select-all-checkbox"
-                    class="rounded border-indigo-300 bg-indigo-100 text-indigo-600 focus:ring-indigo-400 cursor-pointer"
+                    class="rounded border-cyan-300 bg-cyan-100 text-cyan-600 focus:ring-cyan-400 cursor-pointer"
                   />
                 </th>
                 <th
@@ -259,7 +259,7 @@
             <input
               type="text"
               id="task-input"
-              class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+              class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition-all"
               placeholder="e.g., Writing Report"
               required
               autofocus
@@ -275,7 +275,7 @@
               <input
                 type="datetime-local"
                 id="start-time-input"
-                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition-all"
               />
             </div>
             <div>
@@ -287,7 +287,7 @@
               <input
                 type="datetime-local"
                 id="end-time-input"
-                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition-all"
               />
             </div>
           </div>
@@ -301,7 +301,7 @@
             </button>
             <button
               type="submit"
-              class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-md transition-colors"
+              class="px-6 py-2 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-lg shadow-md transition-colors"
             >
               Start Tracking
             </button>
