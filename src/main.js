@@ -140,6 +140,20 @@ taskModal.addEventListener('click', (e) => {
     }
 });
 
+// Close modals on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        // Check if task modal is visible
+        if (!taskModal.classList.contains('hidden')) {
+            hideModal();
+        }
+        // Check if delete modal is visible
+        if (!deleteModal.classList.contains('hidden')) {
+            hideDeleteModal();
+        }
+    }
+});
+
 // --- Core Functions ---
 
 function showModal(mode = 'start', index = null) {
