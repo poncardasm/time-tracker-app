@@ -18,12 +18,6 @@ export function useTimer() {
   const notifyUser = (title, body) => {
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification(title, { body, icon: '/icon-192.svg' });
-    } else if ('Notification' in window && Notification.permission !== 'denied') {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          new Notification(title, { body, icon: '/icon-192.svg' });
-        }
-      });
     }
   };
 
@@ -45,11 +39,18 @@ export function useTimer() {
          phase: 'work',
          remaining: prev.workDuration
        }));
-       
+
+       // Request notification permission upfront before timer starts
        if ('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission();
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            console.log('Notification permission granted - you will receive alerts when timer completes');
+          } else {
+            console.warn('Notification permission denied - you will only hear audio alerts');
+          }
+        });
       }
-      
+
       // Initialize audio context on user interaction (unlock audio)
       initializeAudioContext();
     }
@@ -75,8 +76,16 @@ export function useTimer() {
 
   useEffect(() => {
     if (!activeTask) {
-        if (intervalRef.current) clearInterval(intervalRef.current);
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
         return;
+    }
+
+    // Clear any existing interval to prevent duplicates (React Strict Mode)
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
     }
 
     intervalRef.current = setInterval(() => {
@@ -85,12 +94,12 @@ export function useTimer() {
       } else if (activeTask.mode === 'pomodoro') {
          setPomodoroState(prev => {
              const nextRemaining = prev.remaining - 1000;
-             
+
              if (nextRemaining <= 0) {
                  // Switch phase
                  const nextPhase = prev.phase === 'work' ? 'break' : 'work';
                  const nextDuration = nextPhase === 'work' ? prev.workDuration : prev.breakDuration;
-                 
+
                 notifyUser(
                     nextPhase === 'break' ? "Time for a break!" : "Back to work!",
                     nextPhase === 'break' ? "Great work! Take 5 minutes to recharge." : "Break is over. Let's focus!"
@@ -103,14 +112,20 @@ export function useTimer() {
                      remaining: nextDuration
                  };
              }
-             
+
              return { ...prev, remaining: nextRemaining };
          });
+
+         // Update elapsed time for display
+         setElapsedMs(Date.now() - activeTask.startTime);
       }
     }, 1000);
 
     return () => {
-        if (intervalRef.current) clearInterval(intervalRef.current);
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
     };
   }, [activeTask]);
 

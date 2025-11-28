@@ -39,12 +39,12 @@ export function playNotificationSound() {
     if (!notificationAudio) {
       notificationAudio = new Audio('/notification.mp3');
     }
-    
+
     // Reset playback position to start
     notificationAudio.currentTime = 0;
-    
+
     const playPromise = notificationAudio.play();
-    
+
     if (playPromise !== undefined) {
       playPromise.catch(error => {
         console.error('Audio playback failed:', error);
