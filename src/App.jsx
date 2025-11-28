@@ -103,6 +103,7 @@ function App() {
         onClose={() => setIsTaskModalOpen(false)}
         mode={taskModalMode}
         initialData={editingTaskIndex !== null ? tasks[editingTaskIndex] : null}
+        tasks={tasks}
         onSubmit={handleTaskSubmit}
       />
 
