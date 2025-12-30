@@ -102,25 +102,30 @@
 </script>
 
 {#if isOpen}
-  <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+  <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
   <div
+    role="presentation"
     class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-300"
     onclick={handleBackdropClick}
   >
-    <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+    <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      tabindex="-1"
       class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 w-full max-w-md transform transition-all duration-300 scale-100"
       onclick={handleModalClick}
     >
-      <h3 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+      <h3 id="modal-title" class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
         {mode === 'edit' ? 'Edit Task' : 'What are you working on?'}
       </h3>
       <form onsubmit={handleSubmit}>
         {#if mode === 'start'}
           <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Timer Mode
-            </label>
+            </span>
             <div class="flex space-x-4">
               <label class="inline-flex items-center cursor-pointer">
                 <input
@@ -153,10 +158,11 @@
         {/if}
 
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label for="task-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Task Description
           </label>
           <input
+            id="task-description"
             type="text"
             bind:value={description}
             class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition-all"
@@ -165,12 +171,13 @@
           />
         </div>
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label for="task-project" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Project
             <span class="text-gray-400 font-normal">(Optional)</span>
           </label>
           <div class="relative">
             <input
+              id="task-project"
               type="text"
               bind:value={project}
               oninput={() => showSuggestions = true}
@@ -199,20 +206,22 @@
         {#if mode === 'manual' || mode === 'edit'}
           <div class="space-y-4 mb-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label for="start-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Start Time
               </label>
               <input
+                id="start-time"
                 type="datetime-local"
                 bind:value={startTime}
                 class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition-all"
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label for="end-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 End Time
               </label>
               <input
+                id="end-time"
                 type="datetime-local"
                 bind:value={endTime}
                 class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition-all"
