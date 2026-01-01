@@ -15,6 +15,7 @@ let initialized = $state(false);
 // Initialize tasks from Supabase
 export async function initializeTasks() {
 	const user = getUser();
+	console.log('Initializing tasks for user:', user?.email);
 	if (!user) {
 		tasks = [];
 		initialized = true;
@@ -25,6 +26,7 @@ export async function initializeTasks() {
 		loading = true;
 		error = null;
 
+		console.log('Fetching tasks from Supabase...');
 		// Fetch tasks from Supabase
 		const { data, error: fetchError } = await supabase
 			.from('tasks')
@@ -34,6 +36,7 @@ export async function initializeTasks() {
 
 		if (fetchError) throw fetchError;
 
+		console.log('Tasks fetched successfully:', data?.length || 0, 'tasks');
 		// Convert timestamps to numbers for compatibility
 		tasks = (data || []).map(task => ({
 			id: task.id,

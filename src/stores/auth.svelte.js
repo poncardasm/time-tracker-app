@@ -21,14 +21,16 @@ async function initialize() {
 
 		if (sessionError) throw sessionError;
 
-		session = currentSession;
-		user = currentSession?.user ?? null;
+	session = currentSession;
+	user = currentSession?.user ?? null;
+	console.log('Auth initialized. User:', user?.email);
 
-		// Listen for auth changes
-		supabase.auth.onAuthStateChange((_event, newSession) => {
-			session = newSession;
-			user = newSession?.user ?? null;
-		});
+	// Listen for auth changes
+	supabase.auth.onAuthStateChange((event, newSession) => {
+		console.log('Auth state changed:', event, 'User:', newSession?.user?.email);
+		session = newSession;
+		user = newSession?.user ?? null;
+	});
 	} catch (err) {
 		console.error('Error initializing auth:', err);
 		error = err.message;
@@ -78,6 +80,7 @@ async function signIn(email, password) {
 		loading = true;
 		error = null;
 
+		console.log('Attempting sign in for:', email);
 		const { data, error: signInError } = await supabase.auth.signInWithPassword({
 			email,
 			password
@@ -85,6 +88,7 @@ async function signIn(email, password) {
 
 		if (signInError) throw signInError;
 
+		console.log('Sign in successful:', data.user?.email);
 		return { data, error: null };
 	} catch (err) {
 		console.error('Sign in error:', err);
