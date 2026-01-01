@@ -1,4 +1,6 @@
 <script>
+  import SyncStatus from './SyncStatus.svelte';
+
   let { toggleTheme, isDark, user = null, onSignOut = () => {} } = $props();
 </script>
 
@@ -41,4 +43,10 @@
   <p class="text-gray-500 dark:text-gray-400 mt-2">
     Focus on your work, we'll track the time.
   </p>
+
+  {#if user}
+    <div class="mt-3 flex justify-center">
+      <SyncStatus />
+    </div>
+  {/if}
 </header>

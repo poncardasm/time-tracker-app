@@ -11,6 +11,7 @@
   import TaskModal from './components/TaskModal.svelte';
   import DeleteModal from './components/DeleteModal.svelte';
   import MigrationModal from './components/MigrationModal.svelte';
+  import Toast from './components/Toast.svelte';
 
   let isTaskModalOpen = $state(false);
   let taskModalMode = $state('start'); // start, manual, edit
@@ -134,5 +135,8 @@
       isOpen={isMigrationModalOpen}
       onClose={() => isMigrationModalOpen = false}
     />
+
+    <!-- Toast notifications -->
+    <Toast />
   </div>
 </AuthProvider>

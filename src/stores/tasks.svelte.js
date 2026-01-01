@@ -1,6 +1,7 @@
 // Tasks store - migrated to use Supabase with localStorage cache
 import { supabase } from '../lib/supabase.js';
 import { getUser } from './auth.svelte.js';
+import { showError } from './toast.svelte.js';
 
 const STORAGE_KEY = 'timeTrackerTasks';
 const CACHE_KEY = 'timeTrackerTasksCache';
@@ -49,6 +50,7 @@ export async function initializeTasks() {
 	} catch (err) {
 		console.error('Error initializing tasks:', err);
 		error = err.message;
+		showError('Failed to load tasks. Using offline data.');
 
 		// Fallback to cached data
 		tasks = loadFromCache();
@@ -147,6 +149,7 @@ export async function addTask(task) {
 	} catch (err) {
 		console.error('Error adding task:', err);
 		error = err.message;
+		showError('Failed to save task. Please try again.');
 
 		// Revert optimistic update
 		tasks = tasks.filter(t => t.id !== tempTask.id);
@@ -214,6 +217,7 @@ export async function updateTask(index, updatedTask) {
 	} catch (err) {
 		console.error('Error updating task:', err);
 		error = err.message;
+		showError('Failed to update task. Please try again.');
 
 		// Revert optimistic update
 		tasks = previousTasks;
@@ -262,6 +266,7 @@ export async function deleteTasks(indicesToDelete) {
 	} catch (err) {
 		console.error('Error deleting tasks:', err);
 		error = err.message;
+		showError('Failed to delete tasks. Please try again.');
 
 		// Revert optimistic update
 		tasks = previousTasks;
@@ -367,6 +372,7 @@ export async function migrateLegacyTasks() {
 	} catch (err) {
 		console.error('Error migrating tasks:', err);
 		error = err.message;
+		showError('Failed to migrate tasks. Please try again.');
 		return { success: false, error: err.message };
 	} finally {
 		loading = false;
