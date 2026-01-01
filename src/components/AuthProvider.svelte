@@ -5,19 +5,30 @@
 	import Login from './Login.svelte';
 	import SignUp from './SignUp.svelte';
 	import ForgotPassword from './ForgotPassword.svelte';
+	import ResetPassword from './ResetPassword.svelte';
 
 	const { children } = $props();
 
-	let authView = $state('login'); // 'login', 'signup', 'forgot-password'
+	let authView = $state('login'); // 'login', 'signup', 'forgot-password', 'reset-password'
 	let initialized = $state(false);
 
 	onMount(async () => {
+		// Check if URL contains password reset token
+		const hash = window.location.hash;
+		if (hash && hash.includes('type=recovery')) {
+			authView = 'reset-password';
+		}
+
 		await initialize();
 		initialized = true;
 	});
 
 	function handleNavigate(view) {
 		authView = view;
+		// Clear hash when navigating away from reset password
+		if (window.location.hash) {
+			window.history.replaceState(null, '', window.location.pathname);
+		}
 	}
 
 	// Reactive getters
@@ -67,6 +78,8 @@
 		<SignUp onNavigate={handleNavigate} />
 	{:else if authView === 'forgot-password'}
 		<ForgotPassword onNavigate={handleNavigate} />
+	{:else if authView === 'reset-password'}
+		<ResetPassword onNavigate={handleNavigate} />
 	{/if}
 {:else}
 	<!-- Authenticated - render app -->
