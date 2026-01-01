@@ -2,6 +2,8 @@
   import { getIsDark, toggleTheme } from './stores/theme.svelte.js';
   import { getTasks, addTask, updateTask, deleteTasks } from './stores/tasks.svelte.js';
   import { getActiveTask, getElapsedMs, getPomodoroState, startTask, stopTask } from './stores/timer.svelte.js';
+  import { getUser, signOut } from './stores/auth.svelte.js';
+  import AuthProvider from './components/AuthProvider.svelte';
   import Header from './components/Header.svelte';
   import StartView from './components/StartView.svelte';
   import ActiveView from './components/ActiveView.svelte';
@@ -66,46 +68,52 @@
   function handleEditRequest(index) {
     openTaskModal('edit', index);
   }
+
+  async function handleSignOut() {
+    await signOut();
+  }
 </script>
 
-<div class="bg-gray-100 text-gray-900 font-sans min-h-screen flex flex-col items-center py-10 px-4 dark:bg-slate-900 dark:text-white transition-colors duration-300">
-  <Header {toggleTheme} isDark={getIsDark()} />
+<AuthProvider>
+  <div class="bg-gray-100 text-gray-900 font-sans min-h-screen flex flex-col items-center py-10 px-4 dark:bg-slate-900 dark:text-white transition-colors duration-300">
+    <Header {toggleTheme} isDark={getIsDark()} user={getUser()} onSignOut={handleSignOut} />
 
-  <main class="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 mb-8 transition-all duration-300 ease-in-out">
-    {#if !getActiveTask()}
-      <StartView
-        onStartClick={() => openTaskModal('start')}
-        onManualClick={() => openTaskModal('manual')}
-      />
-    {:else}
-      <ActiveView
-        activeTask={getActiveTask()}
-        elapsedMs={getElapsedMs()}
-        pomodoroState={getPomodoroState()}
-        onStop={handleStopTask}
-      />
-    {/if}
-  </main>
+    <main class="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 mb-8 transition-all duration-300 ease-in-out">
+      {#if !getActiveTask()}
+        <StartView
+          onStartClick={() => openTaskModal('start')}
+          onManualClick={() => openTaskModal('manual')}
+        />
+      {:else}
+        <ActiveView
+          activeTask={getActiveTask()}
+          elapsedMs={getElapsedMs()}
+          pomodoroState={getPomodoroState()}
+          onStop={handleStopTask}
+        />
+      {/if}
+    </main>
 
-  <HistoryList
-    tasks={getTasks()}
-    onRequestDelete={handleDeleteRequest}
-    onEdit={handleEditRequest}
-  />
+    <HistoryList
+      tasks={getTasks()}
+      onRequestDelete={handleDeleteRequest}
+      onEdit={handleEditRequest}
+    />
 
-  <TaskModal
-    isOpen={isTaskModalOpen}
-    onClose={() => isTaskModalOpen = false}
-    mode={taskModalMode}
-    initialData={editingTaskIndex !== null ? getTasks()[editingTaskIndex] : null}
-    tasks={getTasks()}
-    onSubmit={handleTaskSubmit}
-  />
+    <TaskModal
+      isOpen={isTaskModalOpen}
+      onClose={() => isTaskModalOpen = false}
+      mode={taskModalMode}
+      initialData={editingTaskIndex !== null ? getTasks()[editingTaskIndex] : null}
+      tasks={getTasks()}
+      onSubmit={handleTaskSubmit}
+    />
 
-  <DeleteModal
-    isOpen={isDeleteModalOpen}
-    onClose={() => isDeleteModalOpen = false}
-    onConfirm={handleConfirmDelete}
-    count={indicesToDelete.length}
-  />
-</div>
+    <DeleteModal
+      isOpen={isDeleteModalOpen}
+      onClose={() => isDeleteModalOpen = false}
+      onConfirm={handleConfirmDelete}
+      count={indicesToDelete.length}
+    />
+  </div>
+</AuthProvider>
