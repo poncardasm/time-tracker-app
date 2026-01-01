@@ -1,5 +1,5 @@
 <script>
-	import { updatePassword } from '../stores/auth.svelte.js';
+	import { updatePassword, signOut } from '../stores/auth.svelte.js';
 
 	let password = $state('');
 	let confirmPassword = $state('');
@@ -36,6 +36,8 @@
 			loading = false;
 		} else {
 			success = true;
+			// Sign out the user so they can sign in with their new password
+			await signOut();
 			loading = false;
 		}
 	}
