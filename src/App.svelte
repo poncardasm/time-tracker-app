@@ -24,11 +24,11 @@
     isTaskModalOpen = true;
   }
 
-  function handleTaskSubmit(data) {
+  async function handleTaskSubmit(data) {
     if (taskModalMode === 'start') {
       startTask(data.description, data.project, data.mode);
     } else if (taskModalMode === 'manual') {
-      addTask({
+      await addTask({
         taskName: data.description,
         project: data.project,
         startTime: data.startTime,
@@ -36,7 +36,7 @@
         durationMs: data.durationMs,
       });
     } else if (taskModalMode === 'edit' && editingTaskIndex !== null) {
-      updateTask(editingTaskIndex, {
+      await updateTask(editingTaskIndex, {
         taskName: data.description,
         project: data.project,
         startTime: data.startTime,
@@ -47,10 +47,10 @@
     isTaskModalOpen = false;
   }
 
-  function handleStopTask() {
+  async function handleStopTask() {
     const record = stopTask();
     if (record) {
-      addTask(record);
+      await addTask(record);
     }
   }
 
@@ -59,8 +59,8 @@
     isDeleteModalOpen = true;
   }
 
-  function handleConfirmDelete() {
-    deleteTasks(indicesToDelete);
+  async function handleConfirmDelete() {
+    await deleteTasks(indicesToDelete);
     isDeleteModalOpen = false;
     indicesToDelete = [];
   }

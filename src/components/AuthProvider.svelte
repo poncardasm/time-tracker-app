@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { initialize, getUser, isLoading } from '../stores/auth.svelte.js';
+	import { initializeTasks } from '../stores/tasks.svelte.js';
 	import Login from './Login.svelte';
 	import SignUp from './SignUp.svelte';
 	import ForgotPassword from './ForgotPassword.svelte';
@@ -22,6 +23,13 @@
 	// Reactive getters
 	let user = $derived(getUser());
 	let loading = $derived(isLoading());
+
+	// Initialize tasks when user changes
+	$effect(() => {
+		if (user && initialized) {
+			initializeTasks();
+		}
+	});
 </script>
 
 {#if !initialized || loading}
