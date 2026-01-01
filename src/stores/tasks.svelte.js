@@ -290,3 +290,85 @@ export function clearLegacyData() {
 		localStorage.removeItem(STORAGE_KEY);
 	}
 }
+
+// Migrate legacy localStorage tasks to Supabase
+export async function migrateLegacyTasks() {
+	const user = getUser();
+	if (!user) {
+		return { success: false, error: 'User not authenticated' };
+	}
+
+	const legacyTasks = loadLegacyTasks();
+	if (legacyTasks.length === 0) {
+		return { success: false, error: 'No legacy tasks to migrate' };
+	}
+
+	// Validate tasks
+	const validTasks = legacyTasks.filter(task => {
+		return (
+			task.taskName &&
+			task.startTime &&
+			task.endTime &&
+			task.durationMs &&
+			!isNaN(task.startTime) &&
+			!isNaN(task.endTime) &&
+			task.durationMs > 0
+		);
+	});
+
+	if (validTasks.length === 0) {
+		return { success: false, error: 'No valid tasks found to migrate' };
+	}
+
+	try {
+		loading = true;
+		error = null;
+
+		// Prepare tasks for bulk insert
+		const tasksToInsert = validTasks.map(task => ({
+			user_id: user.id,
+			task_name: task.taskName,
+			project: task.project || null,
+			start_time: new Date(task.startTime).toISOString(),
+			end_time: new Date(task.endTime).toISOString(),
+			duration_ms: task.durationMs
+		}));
+
+		// Bulk insert to Supabase
+		const { data, error: insertError } = await supabase
+			.from('tasks')
+			.insert(tasksToInsert)
+			.select();
+
+		if (insertError) throw insertError;
+
+		// Convert to client format and update local state
+		const migratedTasks = (data || []).map(task => ({
+			id: task.id,
+			taskName: task.task_name,
+			project: task.project,
+			startTime: new Date(task.start_time).getTime(),
+			endTime: new Date(task.end_time).getTime(),
+			durationMs: task.duration_ms
+		}));
+
+		// Refresh tasks list
+		await initializeTasks();
+
+		// Clear legacy data
+		clearLegacyData();
+
+		return {
+			success: true,
+			migratedCount: migratedTasks.length,
+			totalCount: legacyTasks.length,
+			invalidCount: legacyTasks.length - validTasks.length
+		};
+	} catch (err) {
+		console.error('Error migrating tasks:', err);
+		error = err.message;
+		return { success: false, error: err.message };
+	} finally {
+		loading = false;
+	}
+}

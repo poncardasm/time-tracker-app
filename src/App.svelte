@@ -1,6 +1,6 @@
 <script>
   import { getIsDark, toggleTheme } from './stores/theme.svelte.js';
-  import { getTasks, addTask, updateTask, deleteTasks } from './stores/tasks.svelte.js';
+  import { getTasks, addTask, updateTask, deleteTasks, hasLegacyData, isInitialized } from './stores/tasks.svelte.js';
   import { getActiveTask, getElapsedMs, getPomodoroState, startTask, stopTask } from './stores/timer.svelte.js';
   import { getUser, signOut } from './stores/auth.svelte.js';
   import AuthProvider from './components/AuthProvider.svelte';
@@ -10,6 +10,7 @@
   import HistoryList from './components/HistoryList.svelte';
   import TaskModal from './components/TaskModal.svelte';
   import DeleteModal from './components/DeleteModal.svelte';
+  import MigrationModal from './components/MigrationModal.svelte';
 
   let isTaskModalOpen = $state(false);
   let taskModalMode = $state('start'); // start, manual, edit
@@ -17,6 +18,19 @@
 
   let isDeleteModalOpen = $state(false);
   let indicesToDelete = $state([]);
+
+  let isMigrationModalOpen = $state(false);
+  let migrationChecked = $state(false);
+
+  // Check for legacy data after tasks are initialized
+  $effect(() => {
+    if (isInitialized() && !migrationChecked && getUser()) {
+      migrationChecked = true;
+      if (hasLegacyData()) {
+        isMigrationModalOpen = true;
+      }
+    }
+  });
 
   function openTaskModal(mode, index = null) {
     taskModalMode = mode;
@@ -114,6 +128,11 @@
       onClose={() => isDeleteModalOpen = false}
       onConfirm={handleConfirmDelete}
       count={indicesToDelete.length}
+    />
+
+    <MigrationModal
+      isOpen={isMigrationModalOpen}
+      onClose={() => isMigrationModalOpen = false}
     />
   </div>
 </AuthProvider>
