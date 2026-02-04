@@ -110,3 +110,6 @@ coverage/
 *.backup
 *.old
 *.orig
+
+# Misc
+docs/

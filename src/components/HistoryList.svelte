@@ -1,5 +1,7 @@
 <script>
   import { formatTime } from '../utils.js';
+  import { isLoading } from '../stores/tasks.svelte.js';
+  import LoadingSkeleton from './LoadingSkeleton.svelte';
 
   let { tasks, onRequestDelete, onEdit } = $props();
 
@@ -94,7 +96,11 @@
   }
 </script>
 
-{#if tasks.length === 0}
+{#if isLoading()}
+  <div class="w-full max-w-4xl">
+    <LoadingSkeleton rows={5} />
+  </div>
+{:else if tasks.length === 0}
   <div class="w-full max-w-4xl mt-8 text-center text-gray-500 italic">
     No tasks recorded yet.
   </div>
